@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星界边境 | 自由沙盒服务器</title>
+    <link rel="icon" href="/images/icon/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #39C5BB;
+            --secondary: #25AEBF;
+            --accent: #FF6B6B;
+            --dark: #1A1A2E;
+            --light: rgba(255,255,255,0.9);
+            --mobile-breakpoint: 768px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            color: var(--light);
+            line-height: 1.7;
+            scroll-behavior: smooth;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 星空效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: -1;
+            animation: stars 60s linear infinite;
+        }
+
+        @keyframes stars {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-100%);
+            }
+        }
+
+        /* 星星效果 */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(2px 2px at 20% 30%, #fff 10%, rgba(255,255,255,0) 100%),
+                        radial-gradient(2px 2px at 80% 70%, #fff 10%, rgba(255,255,255,0) 100%),
+                        radial-gradient(2px 2px at 20% 90%, #fff 10%, rgba(255,255,255,0) 100%),
+                        radial-gradient(2px 2px at 90% 20%, #fff 10%, rgba(255,255,255,0) 100%);
+            background-size: 250px 250px;
+            z-index: -1;
+            animation: starMove 120s linear infinite;
+        }
+
+        @keyframes starMove {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-50%);
+            }
+        }
+
+        /* 通用容器 */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* 头部样式 */
+        .header {
+            padding: 6rem 0;
+            background: linear-gradient(45deg, rgba(57,197,187,0.9), rgba(37,174,191,0.9));
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none" stroke="white" stroke-width="2" opacity="0.1"/></svg>');
+            background-size: 40px;
+            opacity: 0.2;
+        }
+
+        .welcome-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            text-shadow: 0 0 20px rgba(57,197,187,0.5);
+            letter-spacing: 2px;
+            transform: translateY(50px);
+            opacity: 0;
+            animation: textReveal 1s 0.5s forwards;
+        }
+
+        @keyframes textReveal {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 按钮容器 */
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem auto;
+        }
+
+        /* 按钮样式 */
+        .neon-btn {
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1rem, 4vw, 1.2rem);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neon-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* 内容区块 */
+        .content-section {
+            margin: 3rem auto;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .content-section.visible {
+            opacity: 1;
+        }
+
+        /* 特征卡片 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        /* 页脚 */
+        footer {
+            padding: 3rem 0;
+            background: var(--dark);
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--dark);
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* 移动端样式 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 4rem 0;
+                clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+            }
+
+            .button-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .neon-btn {
+                padding: 1.2rem;
+            }
+
+            .content-section {
+                padding: 1rem;
+                border-radius: 15px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                padding: 1rem;
+            }
+
+            footer {
+                padding: 2rem 0;
+            }
+        }
+
+        /* 小屏幕优化 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 3rem 0;
+            }
+
+            .welcome-text {
+                font-size: 2rem;
+            }
+
+            .neon-btn {
+                font-size: 1rem;
+            }
+
+            .content-section {
+                margin: 2rem auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="welcome-text">星界边境</h1>
+            <p class="sub-welcome-text">无限可能，由你定义</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="button-container">
+            <button class="neon-btn" onclick="scrollToSection('explore')">探索世界</button>
+            <button class="neon-btn" onclick="window.open('https://qm.qq.com/q/9C6V11xKTu', '_blank')">立即加入</button>
+            <button class="neon-btn" onclick="openModal()">联系我们</button>
+            <button class="neon-btn" onclick="showComingSoon()">未来计划</button>
+        </div>
+
+        <main>
+            <section id="about" class="content-section">
+                <h2>关于星界边境</h2>
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <h3>无限自由</h3>
+                        <p>完全无限制的沙盒世界，创造与破坏的终极体验</p>
+                    </article>
+                    <article class="feature-card">
+                        <h3>极致性能</h3>
+                        <p>采用最新服务器架构，保障流畅游戏体验</p>
+                    </article>
+                </div>
+            </section>
+
+            <section id="explore" class="content-section">
+                <h2>探索世界</h2>
+                <p>欢迎来到星界边境！以下是加入我们的步骤：</p>
+                <ol>
+                    <li><strong>下载客户端：</strong> 访问<a href="https://afdian.com/p/0164034c016c11ebafcb52540025c377" target="_blank">官方网站</a>下载游戏启动器</li>
+                    <li><strong>下载游戏：</strong> 点击下载-自动下载-1.20.2-下载 等待下载完成即可</li>
+                    <li><strong>登录游戏：</strong> 如果您购买了正版游戏请点击正版登录并且登录您的Microsoft账户 
+                                                                          如果您没有购买请点击离线登录并且创建一个自己的账户</li>
+                    <li><strong>选择服务器：</strong> 进入主菜单后点击多人游戏-添加服务器 ip地址请填入h.rainplay.cn:26809 服务器名称自定</li>
+                    <li><strong>开始冒险：</strong> 点击加入服务器，加入游戏后，您可以自由地探索、建造和与其他玩家互动</li>
+                </ol>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 星界边境 | 打造属于你的世界</p>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <div id="contactModal" class="modal-overlay">
+        <div class="modal">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h2>联系我们</h2>
+            <p>Email: contact@example.com</p>
+            <p>Phone: +123 456 7890</p>
+            <p>Address: 123 Star Lane, Universe City</p>
+        </div>
+    </div>
+
+    <script>
+        // 滚动动画触发
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.content-section').forEach((section) => {
+            observer.observe(section);
+        });
+
+        // 跳转至指定区块
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 打开模态框
+        function openModal() {
+            document.getElementById('contactModal').style.display = 'flex';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('contactModal').style.display = 'none';
+        }
+
+        // 其他交互功能
+        function showComingSoon() {
+            alert('更多详情敬请期待！');
+        }
+    </script>
+</body>
+</html>
